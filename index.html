@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Raspberry Temperature Controller</title>
+  </head>
+  <body>
+    
+    <div class="jumbotron jumbotron-flui">
+      <div class="container">
+        <h1 class="display-4">Raspberry Temperature</h1>
+        <p class="lead">
+          <span class="font-weight-bold h3" id="temperature"></span>
+          <span id="feedback" class="d-block">starting counter, please wait</span>
+          <span id="timer"></span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    
+    <script
+    src="http://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  
+    <script>
+
+    var callApi = function(){
+      
+      $.ajax({
+        url:'http://192.168.1.10:81/api'
+      })
+        .done(function(data){
+          $('#temperature').html(data.replace('temp=',''));
+        });
+    };
+
+    
+    var idx=5;
+    var x = setInterval(function(){
+      if (idx<=0){
+        idx=5;
+        $('#timer').html(idx);
+
+        setLogMsg('loading data')
+        callApi();
+      }
+
+      $('#timer').html(idx);
+      idx-=1;
+    },1000);
+
+
+    function setLogMsg(msg){
+      $('#feedback').html(msg);
+    }
+
+    </script>
+  </body>
+</html>
