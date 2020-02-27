@@ -8,18 +8,55 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['gauge']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      var data = null;
+      var chart = null;
+      var options = null;
+
+      function drawChart() {
+
+        options = {
+          width: 400, height: 250,
+          redFrom: 90, redTo: 100,
+          yellowFrom:75, yellowTo: 90,
+          minorTicks: 10,
+          animation:{
+            duration: 1000,
+            easing: 'in',
+          }
+        };
+
+        data = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          ['Temp°', 0]
+        ]);
+
+        chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+        chart.draw(data, options);
+
+      }
+    </script>
     <title>Raspberry Temperature Controller</title>
   </head>
   <body>
     
-    <div class="jumbotron jumbotron-flui">
-      <div class="container">
-        <h1 class="display-4">Raspberry Temperature</h1>
-        <p class="lead">
-          <span class="font-weight-bold h3" id="temperature"></span>
-          <span id="feedback" class="d-block">starting counter, please wait</span>
-          <span id="timer"></span>
-        </p>
+    <div class="container">
+      <div class="row pt-5">
+        <div class="col-sm">
+          <h2>Raspberry Temperature</h2>
+          <p>
+            <span class="font-weight-bold h3" id="temperature"></span>
+            <span id="feedback" class="d-block">starting counter, please wait</span>
+            <span id="timer"></span>
+          </p>
+        </div>
+        <div class="col-sm">
+          <div id="chart_div" style="width: 400px; height: 250px;"></div>
+        </div>
       </div>
     </div>
 
@@ -41,8 +78,14 @@
       $.ajax({
         url:'http://192.168.1.10:81/api'
       })
-        .done(function(data){
-          $('#temperature').html(data.replace('temp=',''));
+        .done(function(apiData){
+          var temp = apiData.replace('temp=','')
+          $('#temperature').html(temp);
+
+          var temp = parseFloat(apiData.replace('temp=',''))
+          //console.log(temp);
+          data.setValue(0, 1, parseFloat(temp));
+          chart.draw(data, options);
         });
     };
 
